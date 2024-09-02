@@ -16,6 +16,7 @@ L := wheelbase of car
 (6.2) https://arxiv.org/pdf/1711.03449.pdf
 """
 
+
 class DubinsCar4D2:
     def __init__(
         self,
@@ -27,7 +28,6 @@ class DubinsCar4D2:
         uMode="max",
         dMode="min",
     ):
-
         """Creates a Dublin Car with the following states:
            X position, Y position, acceleration, heading
 
@@ -82,7 +82,6 @@ class DubinsCar4D2:
         in3 = hcl.scalar(0, "in3")
         in4 = hcl.scalar(0, "in4")
 
-
         if self.uMode == "min":
             with hcl.if_(spat_deriv[2] > 0):
                 opt_a[0] = self.uMin[0]
@@ -96,7 +95,6 @@ class DubinsCar4D2:
         # return 3, 4 even if you don't use them
         return (opt_a[0], opt_w[0], in3[0], in4[0])
 
-
     def opt_dstb(self, t, state, spat_deriv):
         """
         :param spat_deriv: tuple of spatial derivative in all dimensions
@@ -109,7 +107,7 @@ class DubinsCar4D2:
         d3 = hcl.scalar(0, "d3")
         d4 = hcl.scalar(0, "d4")
 
-        #with hcl.if_(self.dMode == "max"):
+        # with hcl.if_(self.dMode == "max"):
         if self.dMode == "max":
             with hcl.if_(spat_deriv[0] > 0):
                 d1[0] = self.dMax[0]
@@ -179,6 +177,3 @@ class DubinsCar4D2:
                 opt_w = self.uMin[1]
 
         return opt_a, opt_w
-
-
-

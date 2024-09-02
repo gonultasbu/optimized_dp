@@ -1,14 +1,16 @@
-import imp
 import numpy as np
+
 # Utility functions to initialize the problem
 from odp.Grid import Grid
 from odp.Shapes import *
 
 # Specify the  file that includes dynamic systems
 from odp.dynamics import DubinsCapture, Plane2D, Plane1D, DubinsCar4D
+
 # Plot options
 from odp.Plots import PlotOptions
 from odp.Plots import plot_isosurface, plot_valuefunction
+
 # Solver core
 from odp.solver import HJSolver, computeSpatDerivArray
 
@@ -28,14 +30,14 @@ Note: If run on the server, please save the result and use the plot function on 
 
 if os.path.exists("plots") == False:
     os.mkdir("plots")
-        
+
 ##################################################### 4D EXAMPLE #####################################################
 # STEP 1: Define grid
 grid_min = np.array([-4.0, -4.0, -4.0, -math.pi])
 grid_max = np.array([4.0, 4.0, 4.0, math.pi])
 dims = 4
 N = np.array([80, 80, 80, 80])
-pd=[3]
+pd = [3]
 g = Grid(grid_min, grid_max, dims, N, pd)
 
 # STEP 2: Generate initial values for grid using shape functions
@@ -52,14 +54,25 @@ small_number = 1e-5
 tau = np.arange(start=0, stop=Lookback_length + small_number, step=t_step)
 
 # STEP 4: System dynamics for computation
-sys4D = DubinsCar4D(uMode="max", dMode="min")  
+sys4D = DubinsCar4D(uMode="max", dMode="min")
 
 # STEP 5: Initialize plotting option
-po = PlotOptions(do_plot=True, plot_type="set", plotDims=[0,1,3], slicesCut=[50], colorscale="Bluered", save_fig=False, filename="plots/4D_0_sublevel_set", interactive_html=True)
+po = PlotOptions(
+    do_plot=True,
+    plot_type="set",
+    plotDims=[0, 1, 3],
+    slicesCut=[50],
+    colorscale="Bluered",
+    save_fig=False,
+    filename="plots/4D_0_sublevel_set",
+    interactive_html=True,
+)
 
 # STEP 6: Call HJSolver function
-compMethod = { "TargetSetMode": "None"}
-result_3 = HJSolver(sys4D, g, Initial_value_f, tau, compMethod, po, saveAllTimeSteps=True)
+compMethod = {"TargetSetMode": "None"}
+result_3 = HJSolver(
+    sys4D, g, Initial_value_f, tau, compMethod, po, saveAllTimeSteps=True
+)
 
 
 ##################################################### 3D EXAMPLE #####################################################
@@ -68,7 +81,7 @@ grid_min = np.array([-4.0, -4.0, -math.pi])
 grid_max = np.array([4.0, 4.0, math.pi])
 dims = 3
 N = np.array([150, 150, 150])
-pd=[2]
+pd = [2]
 g = Grid(grid_min, grid_max, dims, N, pd)
 
 # STEP 2: Generate initial values for grid using shape functions
@@ -88,15 +101,17 @@ tau = np.arange(start=0, stop=Lookback_length + small_number, step=t_step)
 sys = DubinsCapture(uMode="max", dMode="min")
 
 # STEP 5: Initialize plotting option
-po1 = PlotOptions(do_plot=False, plot_type="set", plotDims=[0,1,2])
+po1 = PlotOptions(do_plot=False, plot_type="set", plotDims=[0, 1, 2])
 
 # STEP 6: Call HJSolver function
-compMethod = { "TargetSetMode": "None"}
-result_3 = HJSolver(sys, g, Initial_value_f, tau, compMethod, po1, saveAllTimeSteps=True)
+compMethod = {"TargetSetMode": "None"}
+result_3 = HJSolver(
+    sys, g, Initial_value_f, tau, compMethod, po1, saveAllTimeSteps=True
+)
 
-'''
+"""
 Test downsample function
-'''
+"""
 # print(result_3[:,:,:,1].shape)
 # print(g.dims)
 # g_out, data_out = downsample(g, result_3, [2,2,2])
@@ -105,8 +120,16 @@ Test downsample function
 
 
 # While file needs to be saved locally, set save_fig=True and filename, recommend to set interactive_html=True for better visualization
-po2 = PlotOptions(do_plot=False, plot_type="set", plotDims=[0,1,2],
-                  slicesCut=[1], colorscale="Bluered", save_fig=True, filename="plots/3D_0_sublevel_set", interactive_html=True)
+po2 = PlotOptions(
+    do_plot=False,
+    plot_type="set",
+    plotDims=[0, 1, 2],
+    slicesCut=[1],
+    colorscale="Bluered",
+    save_fig=True,
+    filename="plots/3D_0_sublevel_set",
+    interactive_html=True,
+)
 
 # STEP 6: Call Plotting function
 plot_isosurface(g, result_3, po2)
@@ -136,20 +159,38 @@ tau = np.arange(start=0, stop=Lookback_length + small_number, step=t_step)
 sys = Plane2D()
 
 # STEP 5: Initialize plotting option
-po1 = PlotOptions(do_plot=True, plot_type="value", plotDims=[0,1])
+po1 = PlotOptions(do_plot=True, plot_type="value", plotDims=[0, 1])
 
 # STEP 6: Call HJSolver function
-compMethod = { "TargetSetMode": "None"}
-result_2 = HJSolver(sys, g_2, Initial_value_f, tau, compMethod, po1, saveAllTimeSteps=True)
+compMethod = {"TargetSetMode": "None"}
+result_2 = HJSolver(
+    sys, g_2, Initial_value_f, tau, compMethod, po1, saveAllTimeSteps=True
+)
 
-# Visualization of animated 2D value function 
-po2 = PlotOptions(do_plot=False, plot_type="value", plotDims=[0,1],
-                  slicesCut=[50], colorscale="Hot", save_fig=True, filename="plots/2D_0_valuefunction", interactive_html=True)
+# Visualization of animated 2D value function
+po2 = PlotOptions(
+    do_plot=False,
+    plot_type="value",
+    plotDims=[0, 1],
+    slicesCut=[50],
+    colorscale="Hot",
+    save_fig=True,
+    filename="plots/2D_0_valuefunction",
+    interactive_html=True,
+)
 plot_valuefunction(g, result_3, po2)
 
 # Visualization of animated 2D 0 sublevel set
-po3 = PlotOptions(do_plot=False, plot_type="set", plotDims=[0,1],
-                  slicesCut=[50], colorscale="Bluered", save_fig=True, filename="plots/2D_0_sublevel_set", interactive_html=True)
+po3 = PlotOptions(
+    do_plot=False,
+    plot_type="set",
+    plotDims=[0, 1],
+    slicesCut=[50],
+    colorscale="Bluered",
+    save_fig=True,
+    filename="plots/2D_0_sublevel_set",
+    interactive_html=True,
+)
 plot_isosurface(g, result_3, po3)
 
 
@@ -166,7 +207,7 @@ target_min_1 = np.array([-1.0])
 target_max_1 = np.array([1.0])
 Initial_value_f_1 = ShapeRectangle(g_1, target_min_1, target_max_1)
 
-#print(Initial_value_f_1.shape)
+# print(Initial_value_f_1.shape)
 
 # STEP 3: Time length for computations
 Lookback_length = 2.0
@@ -179,15 +220,22 @@ tau = np.arange(start=0, stop=Lookback_length + small_number, step=t_step)
 sys_1 = Plane1D()
 
 # STEP 5: Initialize plotting option
-po1 = PlotOptions(do_plot=False, plot_type="value", plotDims=[0],
-                  slicesCut=[])
+po1 = PlotOptions(do_plot=False, plot_type="value", plotDims=[0], slicesCut=[])
 
 # STEP 6: Call HJSolver function
-compMethod = { "TargetSetMode": "None"}
+compMethod = {"TargetSetMode": "None"}
 
-result_1 = HJSolver(sys_1, g_1, Initial_value_f_1, tau, compMethod, po1, saveAllTimeSteps=True)
+result_1 = HJSolver(
+    sys_1, g_1, Initial_value_f_1, tau, compMethod, po1, saveAllTimeSteps=True
+)
 
-po2 = PlotOptions(do_plot=False, plot_type="value", plotDims=[0],
-                  slicesCut=[50,50], save_fig=True, filename="plots/1D_0_valuefunction.png", interactive_html=False)
+po2 = PlotOptions(
+    do_plot=False,
+    plot_type="value",
+    plotDims=[0],
+    slicesCut=[50, 50],
+    save_fig=True,
+    filename="plots/1D_0_valuefunction.png",
+    interactive_html=False,
+)
 plot_valuefunction(g, result_3, po2)
-
