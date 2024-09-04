@@ -36,7 +36,7 @@ if os.path.exists("plots") == False:
 grid_min = np.array([-10.0, -10.0, -5.0, -5.0])
 grid_max = np.array([10.0, 10.0, 5.0, 5.0])
 dims = 4
-N = np.array([60, 60, 60, 60])
+N = np.array([25, 25, 25, 25])
 pd = []
 g = Grid(grid_min, grid_max, dims, N, pd)
 
@@ -58,10 +58,10 @@ sys = PursuitEvasion(uMode="min", dMode="max")
 po = PlotOptions(
     do_plot=True,
     plot_type="set",
-    plotDims=[0, 1, 3],
-    slicesCut=[50],
+    plotDims=[0, 1, 2],
+    slicesCut=[10],
     colorscale="Bluered",
-    save_fig=False,
+    save_fig=True,
     filename="plots/TwinPMPE_0_sublevel_set",
     interactive_html=True,
 )
@@ -70,6 +70,8 @@ po = PlotOptions(
 compMethod = {"TargetSetMode": "minVWithV0"}
 result = HJSolver(sys, g, Initial_value_f, tau, compMethod, po, saveAllTimeSteps=True)
 
+
+# plot_valuefunction(g, result, po)
 
 last_time_step_result = result[..., 0]
 
@@ -99,3 +101,7 @@ spat_deriv_vector = (
 opt_ax, opt_ay = sys.optCtrl_inPython(spat_deriv_vector)
 print("Optimal x accel is {}\n".format(opt_ax))
 print("Optimal y accel is {}\n".format(opt_ay))
+
+opt_dx, opt_dy = sys.optDstb_inPython(spat_deriv_vector)
+print("Optimal x disturbance is {}\n".format(opt_dx))
+print("Optimal y disturbance is {}\n".format(opt_dy))
