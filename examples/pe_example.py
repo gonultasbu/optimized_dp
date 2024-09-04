@@ -56,7 +56,7 @@ sys = PursuitEvasion(uMode="min", dMode="max")
 
 # STEP 5: Initialize plotting option
 po = PlotOptions(
-    do_plot=True,
+    do_plot=False,
     plot_type="set",
     plotDims=[0, 1, 2],
     slicesCut=[10],
@@ -88,13 +88,40 @@ vx_derivative = computeSpatDerivArray(
 vy_derivative = computeSpatDerivArray(
     g, last_time_step_result, deriv_dim=4, accuracy="medium"
 )
+state = np.array([-1.0, 1.0, 0.0, 0.0])
+corresponding_grid_idxs = []
+for state_dim in range(state.shape[0]):
+    corresponding_grid_idxs.append(
+        np.argmin(np.abs(g.grid_points[state_dim] - state[state_dim]))
+    )
+
 
 # Let's compute optimal control at some random idices
 spat_deriv_vector = (
-    x_derivative[10, 20, 15, 15],
-    y_derivative[10, 20, 15, 15],
-    vx_derivative[10, 20, 15, 15],
-    vy_derivative[10, 20, 15, 15],
+    x_derivative[
+        corresponding_grid_idxs[0],
+        corresponding_grid_idxs[1],
+        corresponding_grid_idxs[2],
+        corresponding_grid_idxs[3],
+    ],
+    y_derivative[
+        corresponding_grid_idxs[0],
+        corresponding_grid_idxs[1],
+        corresponding_grid_idxs[2],
+        corresponding_grid_idxs[3],
+    ],
+    vx_derivative[
+        corresponding_grid_idxs[0],
+        corresponding_grid_idxs[1],
+        corresponding_grid_idxs[2],
+        corresponding_grid_idxs[3],
+    ],
+    vy_derivative[
+        corresponding_grid_idxs[0],
+        corresponding_grid_idxs[1],
+        corresponding_grid_idxs[2],
+        corresponding_grid_idxs[3],
+    ],
 )
 
 # Compute the optimal control
