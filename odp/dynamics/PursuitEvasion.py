@@ -7,10 +7,10 @@ class PursuitEvasion:
     def __init__(
         self,
         x=[0, 0, 0, 0],
-        uMin=[-1, -1],
-        uMax=[1, 1],
-        dMin=[-0.25, -0.25],
-        dMax=[0.25, 0.25],
+        uMin=[-2.45, -2.45],
+        uMax=[2.45, 2.45],
+        dMin=[-9.81, -9.81],
+        dMax=[9.81, 9.81],
         uMode="min",
         dMode="max",
     ):
@@ -26,50 +26,6 @@ class PursuitEvasion:
         else:
             assert dMode == "min"
         self.dMode = dMode
-
-    def opt_ctrl(self, t, state, spat_deriv):
-        opt_ax = hcl.scalar(self.uMax[1], "opt_ax")
-        opt_ay = hcl.scalar(self.uMax[1], "opt_ay")
-        in3 = hcl.scalar(0, "in3")
-        in4 = hcl.scalar(0, "in4")
-        with hcl.if_(spat_deriv[2] > 0):
-            with hcl.if_(self.uMode == "min"):
-                opt_ax[0] = self.uMin[0]
-        with hcl.elif_(spat_deriv[2] < 0):
-            with hcl.if_(self.uMode == "max"):
-                opt_ax[0] = self.uMin[0]
-
-        with hcl.if_(spat_deriv[3] > 0):
-            with hcl.if_(self.uMode == "min"):
-                opt_ay[0] = self.uMin[0]
-        with hcl.elif_(spat_deriv[3] < 0):
-            with hcl.if_(self.uMode == "max"):
-                opt_ay[0] = self.uMin[0]
-
-        return (opt_ax[0], opt_ay[0], in3[0], in4[0])
-
-    def opt_dstb(self, t, state, spat_deriv):
-        opt_dx = hcl.scalar(self.uMin[1], "opt_dx")
-        opt_dy = hcl.scalar(self.uMin[1], "opt_dy")
-
-        d3 = hcl.scalar(0, "d3")
-        d4 = hcl.scalar(0, "d4")
-
-        with hcl.if_(spat_deriv[2] > 0):
-            with hcl.if_(self.dMode == "min"):
-                opt_dx[0] = self.uMax[0]
-        with hcl.elif_(spat_deriv[2] < 0):
-            with hcl.if_(self.dMode == "max"):
-                opt_dx[0] = self.uMax[0]
-
-        with hcl.if_(spat_deriv[3] > 0):
-            with hcl.if_(self.dMode == "min"):
-                opt_dy[0] = self.uMax[0]
-        with hcl.elif_(spat_deriv[3] < 0):
-            with hcl.if_(self.dMode == "max"):
-                opt_dy[0] = self.uMax[0]
-
-        return (opt_dx[0], opt_dy[0], d3[0], d4[0])
 
     def dynamics(self, t, state, uOpt, dOpt):
         x_dot = hcl.scalar(0, "x_p_dot")
@@ -89,10 +45,53 @@ class PursuitEvasion:
             vy_dot[0],
         )
 
+    def opt_ctrl(self, t, state, spat_deriv):
+        opt_ax = hcl.scalar(self.uMax[0], "opt_ax")
+        opt_ay = hcl.scalar(self.uMax[1], "opt_ay")
+        in3 = hcl.scalar(0, "in3")
+        in4 = hcl.scalar(0, "in4")
+        with hcl.if_(spat_deriv[2] > 0):
+            with hcl.if_(self.uMode == "min"):
+                opt_ax[0] = self.uMin[0]
+        with hcl.elif_(spat_deriv[2] < 0):
+            with hcl.if_(self.uMode == "max"):
+                opt_ax[0] = self.uMin[0]
+
+        with hcl.if_(spat_deriv[3] > 0):
+            with hcl.if_(self.uMode == "min"):
+                opt_ay[0] = self.uMin[1]
+        with hcl.elif_(spat_deriv[3] < 0):
+            with hcl.if_(self.uMode == "max"):
+                opt_ay[0] = self.uMin[1]
+
+        return (opt_ax[0], opt_ay[0], in3[0], in4[0])
+
+    def opt_dstb(self, t, state, spat_deriv):
+        opt_dx = hcl.scalar(self.dMax[0], "opt_dx")
+        opt_dy = hcl.scalar(self.dMax[1], "opt_dy")
+        d3 = hcl.scalar(0, "d3")
+        d4 = hcl.scalar(0, "d4")
+
+        with hcl.if_(spat_deriv[2] > 0):
+            with hcl.if_(self.dMode == "min"):
+                opt_dx[0] = self.dMin[0]
+        with hcl.elif_(spat_deriv[2] < 0):
+            with hcl.if_(self.dMode == "max"):
+                opt_dx[0] = self.dMin[0]
+
+        with hcl.if_(spat_deriv[3] > 0):
+            with hcl.if_(self.dMode == "min"):
+                opt_dy[0] = self.dMin[0]
+        with hcl.elif_(spat_deriv[3] < 0):
+            with hcl.if_(self.dMode == "max"):
+                opt_dy[0] = self.dMin[0]
+
+        return (opt_dx[0], opt_dy[0], d3[0], d4[0])
+
     # Optional: Python implementation for testing or post-processing
-    def optCtrl_inPython(self, state, spat_deriv):
-        opt_ax = self.uMin[1]
-        opt_ay = self.uMin[1]
+    def optCtrl_inPython(self, spat_deriv):
+        opt_ax = self.uMax[0]
+        opt_ay = self.uMax[1]
 
         if spat_deriv[2] > 0:
             if self.uMode == "min":
@@ -103,29 +102,29 @@ class PursuitEvasion:
 
         if spat_deriv[3] > 0:
             if self.uMode == "min":
-                opt_ay = self.uMin[0]
+                opt_ay = self.uMin[1]
         elif spat_deriv[3] < 0:
             if self.uMode == "max":
-                opt_ay = self.uMin[0]
+                opt_ay = self.uMin[1]
 
         return (opt_ax, opt_ay)
 
-    def optDstb_inPython(self, state, spat_deriv):
-        opt_dx = self.uMin[1]
-        opt_dy = self.uMin[1]
+    def optDstb_inPython(self, spat_deriv):
+        opt_dx = self.dMax[0]
+        opt_dy = self.dMax[1]
 
         if spat_deriv[2] > 0:
             if self.dMode == "min":
-                opt_dx = self.uMin[0]
+                opt_dx = self.dMin[0]
         elif spat_deriv[2] < 0:
             if self.dMode == "max":
-                opt_dx = self.uMin[0]
+                opt_dx = self.dMin[0]
 
         if spat_deriv[3] > 0:
             if self.dMode == "min":
-                opt_dy = self.uMin[0]
+                opt_dy = self.dMin[1]
         elif spat_deriv[3] < 0:
             if self.dMode == "max":
-                opt_dy = self.uMin[0]
+                opt_dy = self.dMin[1]
 
         return (opt_dx, opt_dy)
