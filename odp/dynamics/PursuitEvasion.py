@@ -2,6 +2,7 @@
 
 import heterocl as hcl
 import numpy as np
+import random
 
 
 class PursuitEvasion:
@@ -57,6 +58,8 @@ class PursuitEvasion:
         with hcl.elif_(spat_deriv[2] < 0):
             with hcl.if_(self.uMode == "max"):
                 opt_ax[0] = self.uMax[0]
+        with hcl.elif_(spat_deriv[2] == 0):
+            opt_ax[0] = random.choice([self.uMax[0], self.uMin[0]])
 
         with hcl.if_(spat_deriv[3] > 0):
             with hcl.if_(self.uMode == "min"):
@@ -64,6 +67,8 @@ class PursuitEvasion:
         with hcl.elif_(spat_deriv[3] < 0):
             with hcl.if_(self.uMode == "max"):
                 opt_ay[0] = self.uMax[1]
+        with hcl.elif_(spat_deriv[3] == 0):
+            opt_ax[0] = random.choice([self.uMax[1], self.uMin[1]])
 
         return (opt_ax[0], opt_ay[0], in3[0], in4[0])
 
@@ -79,6 +84,8 @@ class PursuitEvasion:
         with hcl.elif_(spat_deriv[2] < 0):
             with hcl.if_(self.dMode == "max"):
                 opt_dx[0] = self.dMin[0]
+        with hcl.elif_(spat_deriv[2] == 0):
+            opt_dx[0] = random.choice([self.dMax[0], self.dMin[0]])
 
         with hcl.if_(spat_deriv[3] > 0):
             with hcl.if_(self.dMode == "min"):
@@ -86,6 +93,8 @@ class PursuitEvasion:
         with hcl.elif_(spat_deriv[3] < 0):
             with hcl.if_(self.dMode == "max"):
                 opt_dy[0] = self.dMin[1]
+        with hcl.elif_(spat_deriv[3] == 0):
+            opt_dx[0] = random.choice([self.dMax[0], self.dMin[0]])
 
         return (opt_dx[0], opt_dy[0], d3[0], d4[0])
 
@@ -101,7 +110,7 @@ class PursuitEvasion:
             if self.uMode == "max":
                 opt_ax = self.uMax[0]
         elif np.isclose(spat_deriv[2], 0):
-            opt_ax = 0
+            opt_ax = random.choice([self.uMax[0], self.uMin[0]])
         if spat_deriv[3] > 0:
             if self.uMode == "min":
                 opt_ay = self.uMax[1]
@@ -109,7 +118,7 @@ class PursuitEvasion:
             if self.uMode == "max":
                 opt_ay = self.uMax[1]
         elif np.isclose(spat_deriv[3], 0):
-            opt_ay = 0
+            opt_ay = random.choice([self.uMax[1], self.uMin[1]])
 
         return (opt_ax, opt_ay)
 
@@ -123,12 +132,15 @@ class PursuitEvasion:
         elif spat_deriv[2] < 0:
             if self.dMode == "max":
                 opt_dx = self.dMin[0]
-
+        elif np.isclose(spat_deriv[2], 0):
+            opt_dy = random.choice(self.dMax[0], self.dMin[0])
         if spat_deriv[3] > 0:
             if self.dMode == "min":
                 opt_dy = self.dMin[1]
         elif spat_deriv[3] < 0:
             if self.dMode == "max":
                 opt_dy = self.dMin[1]
+        elif np.isclose(spat_deriv[3], 0):
+            opt_dy = random.choice(self.dMax[1], self.dMin[1])
 
         return (opt_dx, opt_dy)
