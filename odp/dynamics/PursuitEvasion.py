@@ -1,6 +1,7 @@
 # File: odp/dynamics/PursuitEvasion.py
 
 import heterocl as hcl
+import numpy as np
 
 
 class PursuitEvasion:
@@ -28,11 +29,11 @@ class PursuitEvasion:
         self.dMode = dMode
 
     def dynamics(self, t, state, uOpt, dOpt):
-        x_dot = hcl.scalar(0, "x_p_dot")
-        y_dot = hcl.scalar(0, "y_p_dot")
-        vx_dot = hcl.scalar(0, "vx_p_dot")
-        vy_dot = hcl.scalar(0, "vy_p_dot")
-        # Pursuer dynamics
+        x_dot = hcl.scalar(0, "x_r_dot")
+        y_dot = hcl.scalar(0, "y_r_dot")
+        vx_dot = hcl.scalar(0, "vx_r_dot")
+        vy_dot = hcl.scalar(0, "vy_r_dot")
+        # Relative dynamics
         x_dot[0] = state[2]
         y_dot[0] = state[3]
         vx_dot[0] = dOpt[0] - uOpt[0]
@@ -99,13 +100,16 @@ class PursuitEvasion:
         elif spat_deriv[2] < 0:
             if self.uMode == "max":
                 opt_ax = self.uMax[0]
-
+        elif np.isclose(spat_deriv[2], 0):
+            opt_ax = 0
         if spat_deriv[3] > 0:
             if self.uMode == "min":
                 opt_ay = self.uMax[1]
         elif spat_deriv[3] < 0:
             if self.uMode == "max":
                 opt_ay = self.uMax[1]
+        elif np.isclose(spat_deriv[3], 0):
+            opt_ay = 0
 
         return (opt_ax, opt_ay)
 

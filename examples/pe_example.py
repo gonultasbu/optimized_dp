@@ -31,8 +31,6 @@ Note: If run on the server, please save the result and use the plot function on 
 if os.path.exists("plots") == False:
     os.mkdir("plots")
 
-##################################################### TWINPMPE EXAMPLE #####################################################
-# STEP 1: Define grid
 grid_min = np.array([-10.0, -10.0, -5.0, -5.0])
 grid_max = np.array([10.0, 10.0, 5.0, 5.0])
 dims = 4
@@ -41,9 +39,10 @@ pd = []
 g = Grid(grid_min, grid_max, dims, N, pd)
 
 # STEP 2: Generate initial values for grid using shape functions
-radius = 2.0
-ignore_dims = [2, 3]
-Initial_value_f = CylinderShape(g, ignore_dims, np.zeros(dims), radius)
+# radius = 0.5
+# ignore_dims = [2, 3]
+# Initial_value_f = CylinderShape(g, ignore_dims, np.zeros(dims), radius)
+Initial_value_f = ShapeEllipsoid(g, (0, 0, 0, 0), (0.5, 0.5, 10.0, 10.0))
 # STEP 3: Time length for computations
 Lookback_length = 10.0
 t_step = 0.1
@@ -56,7 +55,7 @@ sys = PursuitEvasion(uMode="min", dMode="max")
 
 # STEP 5: Initialize plotting option
 po = PlotOptions(
-    do_plot=False,
+    do_plot=True,
     plot_type="set",
     plotDims=[0, 1, 2],
     slicesCut=[10],
@@ -88,12 +87,17 @@ vx_derivative = computeSpatDerivArray(
 vy_derivative = computeSpatDerivArray(
     g, last_time_step_result, deriv_dim=4, accuracy="medium"
 )
-state = np.array([-1.0, 1.0, 0.0, 0.0])
+state = np.array([0.87, 4.22, 3.75, 3.24])
 corresponding_grid_idxs = []
 for state_dim in range(state.shape[0]):
     corresponding_grid_idxs.append(
         np.argmin(np.abs(g.grid_points[state_dim] - state[state_dim]))
     )
+
+np.save("x_derivative.npy", x_derivative)
+np.save("y_derivative.npy", y_derivative)
+np.save("vx_derivative.npy", vx_derivative)
+np.save("vy_derivative.npy", vy_derivative)
 
 
 # Let's compute optimal control at some random idices
