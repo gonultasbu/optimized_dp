@@ -93,7 +93,7 @@ for state_dim in range(state.shape[0]):
     corresponding_grid_idxs.append(
         np.argmin(np.abs(g.grid_points[state_dim] - state[state_dim]))
     )
-
+np.save("grid_points.npy", g.grid_points)
 np.save("x_derivative.npy", x_derivative)
 np.save("y_derivative.npy", y_derivative)
 np.save("vx_derivative.npy", vx_derivative)
